@@ -12,10 +12,10 @@
 struct GUPSConfig {
     size_t working_set_size;  // 总工作集大小（字节）
     size_t hot_set_size;      // 热点集大小（字节）
+    double hot_hit_rate;    // 热点命中率 
     size_t num_threads;       // 线程数
     int mem_node;           // Memory NUMA节点
-    int cpu_node;           // CPU NUMA节点
-    double hot_hit_rate;    // 热点命中率   
+    int cpu_node;           // CPU NUMA节点  
     size_t updates_per_thread; // 每个线程的更新次数
     size_t update_object_size; // 每次更新的对象大小（字节）
     
@@ -183,12 +183,12 @@ int main(int argc, char* argv[]) {
     GUPSConfig config {
         .working_set_size = 96ULL * 1024 * 1024 * 1024,  // 96GB
         .hot_set_size = 32ULL * 1024 * 1024 * 1024,      // 32GB
+        .hot_hit_rate = 0.8,
         .num_threads = 32,
         .mem_node = 4,
         .cpu_node = 0,
         .updates_per_thread = 1000000,  // 每线程一百万次更新
-        .update_object_size = 8,         // 64字节
-        .hot_hit_rate = 0.8
+        .update_object_size = 8         // 64字节
     };
 
     // 解析命令行参数
@@ -211,7 +211,7 @@ int main(int argc, char* argv[]) {
         std::cout << config.to_string() << std::endl;
         
         GUPS gups(config);
-        double gups_value = gups.run_benchmark(config.hot_hit_rate);
+        double gups_value = gups.run_benchmark();
         gups.print_performance_stats(gups_value);
         
     } catch (const std::exception& e) {
