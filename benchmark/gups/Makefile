@@ -1,9 +1,9 @@
 CXX = g++
-LDFLAGS = -lnuma
 SRC = gups.cpp
 OBJ_DIR = obj
 BIN_DIR = bin
 TARGET = $(BIN_DIR)/gups
+LDFLAGS = -lnuma -g
 
 OBJS = $(addprefix $(OBJ_DIR)/, $(SRC:.cpp=.o))
 
@@ -21,6 +21,6 @@ clean:
 	rm -f $(OBJ_DIR)/* $(TARGET)
 
 run: all
-	./$(TARGET) --wss 96 --hot 32 --threads 32 --mem 4 --cpu 0 --updates 10000000 --objsize 8
+	./$(TARGET)
 
 .PHONY: all clean run help

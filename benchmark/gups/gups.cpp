@@ -95,7 +95,7 @@ public:
         }
     }
 
-    void worker(int thread_id, double hot_set_probability) {
+    void worker(int thread_id) {
         // 将线程绑定到指定的CPU节点
         pin_thread_to_cpu_node(config.cpu_node);
 
@@ -108,7 +108,7 @@ public:
         std::uniform_real_distribution<double> dis(0.0, 1.0);
 
         for (size_t i = 0; i < config.updates_per_thread; i++) {
-            bool access_hot_set = (dis(gen) < hot_set_probability);
+            bool access_hot_set = (dis(gen) < config.hot_hit_rate);
             uint64_t offset = generate_random_address(seed, access_hot_set);
             
             if (access_hot_set) {
@@ -129,7 +129,7 @@ public:
 
         // 启动所有线程
         for (size_t i = 0; i < config.num_threads; i++) {
-            threads.emplace_back(&GUPS::worker, this, i, config.hot_hit_rate);
+            threads.emplace_back(&GUPS::worker, this, i);
         }
 
         // 监控进度
@@ -179,11 +179,11 @@ int main(int argc, char* argv[]) {
         .working_set_size = 96ULL * 1024 * 1024 * 1024,  // 96GB
         .hot_set_size = 32ULL * 1024 * 1024 * 1024,      // 32GB
         .hot_hit_rate = 0.8,
-        .num_threads = 32,
+        .num_threads = 16,
         .mem_node = 4,
         .cpu_node = 0,
-        .updates_per_thread = 1000000,  // 每线程一百万次更新
-        .update_object_size = 8         // 64字节
+        .updates_per_thread = 100000,  // 每线程一百万次更新
+        .update_object_size = 8         // 8字节
     };
 
     // 解析命令行参数
