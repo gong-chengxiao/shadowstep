@@ -184,7 +184,7 @@ int main(int argc, char* argv[]) {
         .num_threads = 32,
         .mem_node = 4,
         .cpu_node = 0,
-        .updates_per_thread = 10000000,  // 1千万次每线程
+        .updates_per_thread = 1000000,  // 每线程一百万次更新
         .update_object_size = 8         // 64字节
     };
 
