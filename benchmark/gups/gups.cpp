@@ -126,7 +126,7 @@ public:
         }
     }
 
-    double run_benchmark(double hot_set_probability = 0.8) {
+    double run_benchmark() {
         std::vector<std::thread> threads;
         updates_completed.store(0);
 
@@ -134,7 +134,7 @@ public:
 
         // 启动所有线程
         for (size_t i = 0; i < config.num_threads; i++) {
-            threads.emplace_back(&GUPS::worker, this, i, hot_set_probability);
+            threads.emplace_back(&GUPS::worker, this, i, config.hot_hit_rate);
         }
 
         // 监控进度
@@ -187,7 +187,8 @@ int main(int argc, char* argv[]) {
         .mem_node = 4,
         .cpu_node = 0,
         .updates_per_thread = 1000000,  // 每线程一百万次更新
-        .update_object_size = 8         // 64字节
+        .update_object_size = 8,         // 64字节
+        .hot_hit_rate = 0.8
     };
 
     // 解析命令行参数
