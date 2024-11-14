@@ -36,7 +36,6 @@ struct GUPSConfig {
 class GUPS {
 private:
     std::vector<char> memory_pool;     // 主内存池
-    std::vector<char> hot_memory_pool; // 热点内存池
     GUPSConfig config;
     std::atomic<uint64_t> updates_completed{0};
 
@@ -85,7 +84,6 @@ public:
         
         // 分配内存
         memory_pool.resize(config.working_set_size);
-        hot_memory_pool.resize(config.hot_set_size);
         
         // 初始化内存
         std::random_device rd;
@@ -94,9 +92,6 @@ public:
         
         for (size_t i = 0; i < config.working_set_size; i++) {
             memory_pool[i] = dis(gen) & 0xFF;
-        }
-        for (size_t i = 0; i < config.hot_set_size; i++) {
-            hot_memory_pool[i] = dis(gen) & 0xFF;
         }
     }
 
@@ -117,9 +112,9 @@ public:
             uint64_t offset = generate_random_address(seed, access_hot_set);
             
             if (access_hot_set) {
-                update_memory(hot_memory_pool.data(), offset, seed);
-            } else {
                 update_memory(memory_pool.data(), offset, seed);
+            } else {
+                update_memory(memory_pool.data(), config.hot_set_size + offset, seed);
             }
             
             updates_completed.fetch_add(1, std::memory_order_relaxed);
