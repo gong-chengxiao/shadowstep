@@ -7,6 +7,7 @@
 #include <numa.h>
 #include <cstring>
 #include <sstream>
+#include <iomanip>
 
 struct GUPSConfig {
     size_t working_set_size;  // 总工作集大小（字节）
