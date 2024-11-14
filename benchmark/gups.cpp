@@ -15,6 +15,7 @@ struct GUPSConfig {
     size_t num_threads;       // 线程数
     int mem_node;           // Memory NUMA节点
     int cpu_node;           // CPU NUMA节点
+    double hot_hit_rate;    // 热点命中率   
     size_t updates_per_thread; // 每个线程的更新次数
     size_t update_object_size; // 每次更新的对象大小（字节）
     
@@ -172,6 +173,7 @@ public:
                   << "Total Updates: " << (config.updates_per_thread * config.num_threads) << "\n"
                   << "Updates per Thread: " << config.updates_per_thread << "\n"
                   << "Update Object Size: " << config.update_object_size << " bytes\n"
+                  << "Hot Hit Rate: " << config.hot_hit_rate << "\n"
                   << "NUMA Node: " << config.mem_node << std::endl;
     }
 };
@@ -196,6 +198,7 @@ int main(int argc, char* argv[]) {
 
         if (arg == "--wss") config.working_set_size = std::stoull(value) * 1024 * 1024;
         else if (arg == "--hot") config.hot_set_size = std::stoull(value) * 1024 * 1024;
+        else if (arg == "--hot-hit-rate") config.hot_hit_rate = std::stod(value);
         else if (arg == "--threads") config.num_threads = std::stoull(value);
         else if (arg == "--mem") config.mem_node = std::stoi(value);
         else if (arg == "--cpu") config.cpu_node = std::stoi(value);
@@ -207,7 +210,7 @@ int main(int argc, char* argv[]) {
         std::cout << config.to_string() << std::endl;
         
         GUPS gups(config);
-        double gups_value = gups.run_benchmark(0.8); // 80%的访问针对热点集
+        double gups_value = gups.run_benchmark(config.hot_hit_rate);
         gups.print_performance_stats(gups_value);
         
     } catch (const std::exception& e) {
