@@ -84,15 +84,6 @@ public:
         
         // 分配内存
         memory_pool.resize(config.working_set_size);
-        
-        // 初始化内存
-        std::random_device rd;
-        std::mt19937_64 gen(rd());
-        std::uniform_int_distribution<uint64_t> dis;
-        
-        for (size_t i = 0; i < config.working_set_size; i++) {
-            memory_pool[i] = dis(gen) & 0xFF;
-        }
     }
 
     void worker(int thread_id) {
@@ -204,7 +195,7 @@ int main(int argc, char* argv[]) {
 
     try {
         std::cout << config.to_string() << std::endl;
-        
+
         GUPS gups(config);
         double gups_value = gups.run_benchmark();
         gups.print_performance_stats(gups_value);
